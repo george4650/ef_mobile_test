@@ -1,0 +1,39 @@
+http:
+ port: 8081
+
+grpc:
+ port: 5228
+
+ldap:
+ servers: 
+ - ""
+ - ""
+ domains: ""
+
+postgres:
+ host: ""
+ port: 31078
+ user: ""
+ password: ""
+ dbname: ""
+ sslmode: ""
+
+oracle:
+ host: ""
+ port: 
+ service: ""
+ user: ""
+ password: ""
+
+samba:
+ host: ""
+ port: 445
+ domain: ""
+ user: ""
+ password: ""
+
+auth:
+ key: "sUperSecret"
+
+links:
+ audio: ""
