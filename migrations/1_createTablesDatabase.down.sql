@@ -1,4 +1,7 @@
+DROP TABLE IF EXISTS humanresource.users;
 
-DROP TABLE IF EXISTS projects;
+DROP TABLE IF EXISTS tasks.tasks;
 
-DROP TABLE IF EXISTS videos;
+DROP SCHEMA IF EXISTS humanresource;
+
+DROP SCHEMA IF EXISTS tasks;

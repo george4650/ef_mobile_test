@@ -5,26 +5,23 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	_ "github.com/lib/pq"
+	"github.com/rs/zerolog/log"
 	"myapp/internal/models"
 	"myapp/internal/usecase"
-
-	"github.com/rs/zerolog/log"
-
-	_ "github.com/lib/pq"
-	"github.com/uptrace/bun"
 )
 
-func NewScreenRecorderPostgres(Bun *bun.DB) usecase.ScreenRecorderPostgres {
-	return &ScreenRecorderPostgres{
-		Bun: Bun,
+type PostgresRepo struct {
+	connection *sql.DB
+}
+
+func NewPostgresRepo(connection *sql.DB) usecase.ScreenRecorderPostgres {
+	return &PostgresRepo{
+		connection: connection,
 	}
 }
 
-type ScreenRecorderPostgres struct {
-	Bun *bun.DB
-}
-
-func (db *ScreenRecorderPostgres) GetVideo(ctx context.Context, videoId string) (*models.Video, error) {
+func (db *PostgresRepo) GetVideo(ctx context.Context, videoId string) (*models.Video, error) {
 
 	video := models.Video{}
 
@@ -40,7 +37,7 @@ func (db *ScreenRecorderPostgres) GetVideo(ctx context.Context, videoId string) 
 	return &video, nil
 }
 
-func (db *ScreenRecorderPostgres) AddProjectsFromOracle(ctx context.Context, project models.Project) error {
+func (db *PostgresRepo) AddProjectsFromOracle(ctx context.Context, project models.Project) error {
 	_, err := db.Bun.NewInsert().
 		Model(&project).
 		On("CONFLICT (project_uuid) DO UPDATE").
@@ -54,7 +51,7 @@ func (db *ScreenRecorderPostgres) AddProjectsFromOracle(ctx context.Context, pro
 	return nil
 }
 
-func (db *ScreenRecorderPostgres) AddVideo(ctx context.Context, video models.Video) error {
+func (db *PostgresRepo) AddVideo(ctx context.Context, video models.Video) error {
 
 	_, err := db.Bun.NewInsert().Model(&video).Exec(ctx)
 	if err != nil {
@@ -65,7 +62,7 @@ func (db *ScreenRecorderPostgres) AddVideo(ctx context.Context, video models.Vid
 	return nil
 }
 
-func (db *ScreenRecorderPostgres) GetProject(ctx context.Context, uuid string) (*models.Project, error) {
+func (db *PostgresRepo) GetProject(ctx context.Context, uuid string) (*models.Project, error) {
 	project := models.Project{}
 	err := db.Bun.NewSelect().Model(&project).Where("project_uuid = ?", uuid).Scan(ctx)
 	if err != nil {
@@ -78,7 +75,7 @@ func (db *ScreenRecorderPostgres) GetProject(ctx context.Context, uuid string) (
 	return &project, nil
 }
 
-func (db *ScreenRecorderPostgres) AddProject(ctx context.Context, project models.Project) error {
+func (db *PostgresRepo) AddProject(ctx context.Context, project models.Project) error {
 	_, err := db.Bun.NewInsert().Model(&project).Exec(ctx)
 	if err != nil {
 		log.Error().Err(err)
@@ -87,7 +84,7 @@ func (db *ScreenRecorderPostgres) AddProject(ctx context.Context, project models
 	return nil
 }
 
-func (db *ScreenRecorderPostgres) Query(ctx context.Context, searchBy []models.SearchValue, orderBy []models.OrderValue, offset models.Offset) ([]models.ListVideos, error) {
+func (db *PostgresRepo) Query(ctx context.Context, searchBy []models.SearchValue, orderBy []models.OrderValue, offset models.Offset) ([]models.ListVideos, error) {
 
 	videos := []models.ListVideos{}
 
@@ -155,7 +152,7 @@ func (db *ScreenRecorderPostgres) Query(ctx context.Context, searchBy []models.S
 	return videos, err
 }
 
-func (db *ScreenRecorderPostgres) ListVideos(ctx context.Context, searchBy []models.SearchValue, orderBy []models.OrderValue, offset models.Offset) ([]models.ListVideos, error) {
+func (db *PostgresRepo) ListVideos(ctx context.Context, searchBy []models.SearchValue, orderBy []models.OrderValue, offset models.Offset) ([]models.ListVideos, error) {
 
 	videos, err := db.Query(ctx, searchBy, orderBy, offset)
 
@@ -167,7 +164,7 @@ func (db *ScreenRecorderPostgres) ListVideos(ctx context.Context, searchBy []mod
 	return videos, nil
 }
 
-func (db *ScreenRecorderPostgres) CountVideos(ctx context.Context, searchBy []models.SearchValue, orderBy []models.OrderValue, offset models.Offset) (int, error) {
+func (db *PostgresRepo) CountVideos(ctx context.Context, searchBy []models.SearchValue, orderBy []models.OrderValue, offset models.Offset) (int, error) {
 
 	videos, err := db.Query(ctx, searchBy, orderBy, offset)
 	if err != nil {

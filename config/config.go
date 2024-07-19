@@ -9,26 +9,11 @@ import (
 type (
 	Config struct {
 		Http
-		Grpc
-		Ldap
-		Oracle
 		Postgres
-		Samba
-		Auth
-		Links
 	}
 
 	Http struct {
 		Port int
-	}
-
-	Grpc struct {
-		Port int
-	}
-
-	Ldap struct {
-		Servers []string
-		Domains string
 	}
 
 	Postgres struct {
@@ -38,30 +23,6 @@ type (
 		Password string
 		Dbname   string
 		Sslmode  string
-	}
-
-	Oracle struct {
-		Host     string
-		Port     int
-		Service  string
-		User     string
-		Password string
-	}
-
-	Samba struct {
-		Host     string
-		Port     int
-		Domain   string
-		User     string
-		Password string
-	}
-
-	Auth struct {
-		Key string
-	}
-
-	Links struct {
-		Audio string
 	}
 )
 
